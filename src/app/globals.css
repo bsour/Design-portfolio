@@ -112,6 +112,67 @@ body {
 }
 
 /* ------------------------------------------------------------------ *
+ * Hero globe spotlight — B&W inside the cursor orb, color outside.
+ * Hero section only. Disabled on touch / reduced-motion.
+ * ------------------------------------------------------------------ */
+.hero-frame {
+  --spot-x: 50%;
+  --spot-y: 50%;
+  --spot-r: 9rem;
+  --spot-opacity: 0;
+}
+
+.hero-spotlight {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  opacity: var(--spot-opacity);
+  transition: opacity 0.45s ease;
+  -webkit-mask-image: radial-gradient(
+    circle var(--spot-r) at var(--spot-x) var(--spot-y),
+    #000 0%,
+    #000 72%,
+    transparent 100%
+  );
+  mask-image: radial-gradient(
+    circle var(--spot-r) at var(--spot-x) var(--spot-y),
+    #000 0%,
+    #000 72%,
+    transparent 100%
+  );
+}
+
+.hero-spotlight img {
+  filter: grayscale(1) contrast(1.08) brightness(0.95);
+}
+
+.hero-globe-ring {
+  position: absolute;
+  z-index: 2;
+  width: calc(var(--spot-r) * 2);
+  height: calc(var(--spot-r) * 2);
+  left: calc(var(--spot-x) - var(--spot-r));
+  top: calc(var(--spot-y) - var(--spot-r));
+  border-radius: 50%;
+  pointer-events: none;
+  opacity: var(--spot-opacity);
+  transition: opacity 0.45s ease;
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.14),
+    0 0 50px 12px rgba(0, 0, 0, 0.45),
+    inset 0 0 36px rgba(255, 255, 255, 0.07),
+    inset 0 -12px 28px rgba(0, 0, 0, 0.35);
+}
+
+@media (prefers-reduced-motion: reduce), (hover: none), (pointer: coarse) {
+  .hero-spotlight,
+  .hero-globe-ring {
+    display: none;
+  }
+}
+
+/* ------------------------------------------------------------------ *
  * Image treatment — refined grade, not neon
  * ------------------------------------------------------------------ */
 .media {

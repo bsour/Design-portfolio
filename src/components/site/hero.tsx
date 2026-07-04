@@ -10,10 +10,12 @@ import { img } from "@/lib/images";
 
 export function Hero() {
   const root = useRef<HTMLElement>(null);
+  const frame = useRef<HTMLDivElement>(null);
 
   useGSAP(
     () => {
       const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      const canHover = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
 
       const split = new SplitText(".hero-h1", { type: "lines", linesClass: "u-line" });
       // wrap each line in a mask
@@ -34,7 +36,7 @@ export function Hero() {
             ease: "power4.inOut",
           })
           .from(
-            ".hero-frame img",
+            ".hero-image-color",
             { scale: 1.35, duration: 1.6, ease: "power3.out" },
             "<",
           )
@@ -70,6 +72,50 @@ export function Hero() {
         );
       }
 
+      // Globe spotlight — B&W inside the orb, smooth cursor follow
+      if (!reduce && canHover && frame.current && root.current) {
+        const el = frame.current;
+        const section = root.current;
+        const spot = { x: 0, y: 0, o: 0 };
+
+        const paint = () => {
+          el.style.setProperty("--spot-x", `${spot.x}px`);
+          el.style.setProperty("--spot-y", `${spot.y}px`);
+          el.style.setProperty("--spot-opacity", String(spot.o));
+        };
+
+        const onMove = (e: MouseEvent) => {
+          const rect = el.getBoundingClientRect();
+          gsap.to(spot, {
+            x: e.clientX - rect.left,
+            y: e.clientY - rect.top,
+            o: 1,
+            duration: 0.55,
+            ease: "power3.out",
+            onUpdate: paint,
+            overwrite: "auto",
+          });
+        };
+        const onLeave = () => {
+          gsap.to(spot, {
+            o: 0,
+            duration: 0.35,
+            ease: "power2.out",
+            onUpdate: paint,
+            overwrite: "auto",
+          });
+        };
+
+        section.addEventListener("mousemove", onMove);
+        section.addEventListener("mouseleave", onLeave);
+
+        return () => {
+          section.removeEventListener("mousemove", onMove);
+          section.removeEventListener("mouseleave", onLeave);
+          split.revert();
+        };
+      }
+
       return () => split.revert();
     },
     { scope: root },
@@ -80,23 +126,43 @@ export function Hero() {
       ref={root}
       className="relative flex min-h-dvh flex-col justify-end pb-10 pt-28 opacity-0"
     >
-      {/* Full-bleed graded photograph with parallax */}
-      <div className="hero-frame grain absolute inset-0 -z-10 overflow-hidden bg-forest">
+      {/* Full-bleed graded photograph with parallax + globe spotlight */}
+      <div
+        ref={frame}
+        className="hero-frame grain absolute inset-0 -z-10 overflow-hidden bg-forest"
+      >
         <div className="hero-parallax absolute inset-x-0 -inset-y-[8%] w-full">
+          <Image
+            src={img.heroForest}
+            alt=""
+            fill
+            priority
+            sizes="100vw"
+            aria-hidden
+            className="hero-image-color object-cover [filter:saturate(0.85)_contrast(1.03)_brightness(0.97)]"
+          />
+          {/* grade overlay (replaces .media::after) */}
+          <div className="pointer-events-none absolute inset-0 bg-forest/15 mix-blend-multiply" />
+        </div>
+
+        {/* B&W layer revealed inside the globe orb */}
+        <div className="hero-spotlight hero-parallax absolute inset-x-0 -inset-y-[8%] w-full">
           <Image
             src={img.heroForest}
             alt="Misty old-growth forest at dawn"
             fill
             priority
             sizes="100vw"
-            className="object-cover [filter:saturate(0.85)_contrast(1.03)_brightness(0.97)]"
+            className="object-cover"
           />
-          {/* grade overlay (replaces .media::after) */}
-          <div className="pointer-events-none absolute inset-0 bg-forest/15 mix-blend-multiply" />
         </div>
+
+        {/* Globe shadow ring */}
+        <div className="hero-globe-ring z-[3]" aria-hidden />
+
         {/* legibility scrim */}
-        <div className="absolute inset-0 bg-gradient-to-t from-paper via-paper/40 to-transparent" />
-        <div className="absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-paper/70 to-transparent" />
+        <div className="absolute inset-0 z-[2] bg-gradient-to-t from-paper via-paper/40 to-transparent" />
+        <div className="absolute inset-x-0 top-0 z-[2] h-40 bg-gradient-to-b from-paper/70 to-transparent" />
       </div>
 
       <div className="relative mx-auto w-full max-w-[1600px] px-6 md:px-12">
