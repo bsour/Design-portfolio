@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Script from "next/script";
 import { Geist, Geist_Mono, Fraunces } from "next/font/google";
 import "./globals.css";
 
@@ -43,7 +44,12 @@ export default function RootLayout({
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} ${fraunces.variable} antialiased`}
     >
-      <body className="min-h-dvh bg-paper text-ink">{children}</body>
+      <body className="min-h-dvh bg-paper text-ink">
+        <Script id="scroll-restoration" strategy="beforeInteractive">
+          {`history.scrollRestoration='manual';window.scrollTo(0,0);`}
+        </Script>
+        {children}
+      </body>
     </html>
   );
 }
