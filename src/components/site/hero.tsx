@@ -106,19 +106,19 @@ export function Hero() {
           <span className="hidden sm:block">Victoria, Australia · Est. 2004</span>
         </div>
 
-        <div className="liquid-glass-dark mt-10 p-6 sm:p-8 md:mt-12 md:p-12">
+        <div className="mt-10 md:mt-12">
           <div className="grid gap-10 lg:grid-cols-[1.5fr_1fr] lg:items-end">
           <div>
             <p className="eyebrow hero-fade mb-7 flex items-center gap-3">
               <span className="h-px w-10 bg-clay" />
               Precision tree logging
             </p>
-            <h1 className="hero-h1 display-xl text-[15vw] leading-[0.88] sm:text-[12vw] lg:text-[8.6rem]">
+            <h1 className="hero-h1 liquid-glass-dark inline-block w-fit px-6 py-5 display-xl text-[9vw] leading-[0.95] sm:text-[7vw] lg:text-[5rem]">
               We bring down
               <br />
               giants with
               <br />
-              <span className="italic-accent text-clay">grace.</span>
+              <span className="italic-accent">grace.</span>
             </h1>
           </div>
 
