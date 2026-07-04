@@ -52,6 +52,24 @@ export function Hero() {
         gsap.set(root.current, { autoAlpha: 1 });
       }
 
+      // Parallax the hero photo via ScrollTrigger (reliable with fill images)
+      if (!reduce) {
+        gsap.fromTo(
+          ".hero-parallax",
+          { yPercent: -5 },
+          {
+            yPercent: 5,
+            ease: "none",
+            scrollTrigger: {
+              trigger: root.current,
+              start: "top top",
+              end: "bottom top",
+              scrub: true,
+            },
+          },
+        );
+      }
+
       return () => split.revert();
     },
     { scope: root },
@@ -62,17 +80,19 @@ export function Hero() {
       ref={root}
       className="relative flex min-h-dvh flex-col justify-end pb-10 pt-28 opacity-0"
     >
-      {/* Full-bleed graded photograph with parallax (ScrollSmoother data-speed) */}
-      <div className="hero-frame media grain absolute inset-0 -z-10">
-        <div className="absolute inset-0" data-speed="0.85">
+      {/* Full-bleed graded photograph with parallax */}
+      <div className="hero-frame grain absolute inset-0 -z-10 overflow-hidden bg-forest">
+        <div className="hero-parallax absolute inset-x-0 -inset-y-[8%] w-full">
           <Image
             src={img.heroForest}
             alt="Misty old-growth forest at dawn"
             fill
             priority
             sizes="100vw"
-            className="object-cover"
+            className="object-cover [filter:saturate(0.85)_contrast(1.03)_brightness(0.97)]"
           />
+          {/* grade overlay (replaces .media::after) */}
+          <div className="pointer-events-none absolute inset-0 bg-forest/15 mix-blend-multiply" />
         </div>
         {/* legibility scrim */}
         <div className="absolute inset-0 bg-gradient-to-t from-paper via-paper/40 to-transparent" />
