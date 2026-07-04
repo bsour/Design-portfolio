@@ -101,10 +101,14 @@ body {
   text-wrap: balance;
 }
 
-/* Line-mask reveal: wrap lines in .u-mask, animate child .u-line */
+/* Line-mask reveal: wrap lines in .u-mask, animate child .u-line.
+ * padding/negative-margin pair gives descenders (g, y, p) room so the
+ * overflow clip never cuts glyphs, without adding visual line spacing. */
 .u-mask {
   overflow: hidden;
   display: block;
+  padding-bottom: 0.14em;
+  margin-bottom: -0.14em;
 }
 
 /* ------------------------------------------------------------------ *

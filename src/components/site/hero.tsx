@@ -113,12 +113,11 @@ export function Hero() {
               <span className="h-px w-10 bg-clay" />
               Precision tree logging
             </p>
-            <h1 className="hero-h1 liquid-glass-dark inline-block w-fit px-6 py-5 display-xl text-[9vw] leading-[0.95] sm:text-[7vw] lg:text-[5rem]">
+            <h1 className="hero-h1 display-xl text-[13vw] font-medium leading-[0.9] tracking-[-0.03em] text-ink sm:text-[10vw] lg:text-[6.5rem]">
               We bring down
               <br />
-              giants with
-              <br />
-              <span className="italic-accent">grace.</span>
+              giants with{" "}
+              <span className="italic-accent font-normal">grace.</span>
             </h1>
           </div>
 
