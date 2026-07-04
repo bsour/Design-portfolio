@@ -33,11 +33,17 @@ export function SmoothScroll({ children }: { children: React.ReactNode }) {
       requestAnimationFrame(refresh);
       window.addEventListener("load", refresh);
       window.addEventListener("resize", refresh);
+      window.addEventListener("orientationchange", refresh);
+      const t1 = window.setTimeout(refresh, 400);
+      const t2 = window.setTimeout(refresh, 1500);
 
       return () => {
         document.removeEventListener("click", handleAnchorClick);
         window.removeEventListener("load", refresh);
         window.removeEventListener("resize", refresh);
+        window.removeEventListener("orientationchange", refresh);
+        window.clearTimeout(t1);
+        window.clearTimeout(t2);
       };
     }
 

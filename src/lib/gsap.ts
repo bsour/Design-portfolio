@@ -9,6 +9,8 @@ import { useGSAP } from "@gsap/react";
 // Register once on the client. Safe to call repeatedly (GSAP dedupes).
 gsap.registerPlugin(ScrollTrigger, ScrollSmoother, SplitText, useGSAP);
 
+ScrollTrigger.config({ ignoreMobileResize: true });
+
 gsap.defaults({ ease: "power3.out", duration: 1 });
 
 export { gsap, ScrollTrigger, ScrollSmoother, SplitText, useGSAP };

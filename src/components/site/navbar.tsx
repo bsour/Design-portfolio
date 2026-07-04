@@ -3,6 +3,7 @@
 import { useRef, useState } from "react";
 import { Menu, X } from "lucide-react";
 import { gsap, ScrollTrigger, useGSAP } from "@/lib/gsap";
+import { isTouchDevice } from "@/lib/device";
 import { LinkButton } from "./link-button";
 import { Magnetic } from "./magnetic";
 import { cn } from "@/lib/utils";
@@ -21,26 +22,37 @@ export function Navbar() {
 
   useGSAP(
     () => {
-      gsap.from(nav.current, {
-        yPercent: -120,
-        opacity: 0,
-        duration: 1.1,
-        delay: 0.4,
-        ease: "power3.out",
-      });
+      const touch = isTouchDevice();
+
+      if (touch) {
+        gsap.set(nav.current, { y: 0, opacity: 1, clearProps: "transform" });
+      } else {
+        gsap.from(nav.current, {
+          yPercent: -120,
+          opacity: 0,
+          duration: 1.1,
+          delay: 0.4,
+          ease: "power3.out",
+        });
+      }
+
       ScrollTrigger.create({
         start: 40,
         onUpdate: (self) => setScrolled(self.scroll() > 40),
+        invalidateOnRefresh: true,
       });
     },
     { scope: nav },
   );
 
   return (
-    <header ref={nav} className="fixed inset-x-0 top-0 z-50 px-4 pt-4 md:px-6">
+    <header
+      ref={nav}
+      className="pointer-events-auto fixed inset-x-0 top-0 z-[200] px-4 pt-4 md:px-6"
+    >
       <div
         className={cn(
-          "mx-auto flex max-w-[1600px] items-center justify-between rounded-full border border-line bg-paper/70 px-4 py-2.5 backdrop-blur-xl backdrop-saturate-150 transition-all duration-500 md:px-5",
+          "relative z-[201] mx-auto flex max-w-[1600px] items-center justify-between rounded-full border border-line bg-paper/70 px-4 py-2.5 backdrop-blur-xl backdrop-saturate-150 transition-all duration-500 md:px-5",
           scrolled &&
             "bg-paper/80 py-2 shadow-[0_10px_40px_-20px_rgba(22,19,13,0.4)]",
         )}
@@ -76,16 +88,18 @@ export function Navbar() {
         </div>
 
         <button
+          type="button"
+          aria-expanded={open}
+          aria-label={open ? "Close menu" : "Open menu"}
           onClick={() => setOpen((v) => !v)}
-          className="grid h-10 w-10 place-items-center rounded-full border border-line lg:hidden"
-          aria-label="Toggle menu"
+          className="relative z-[202] grid h-10 w-10 touch-manipulation place-items-center rounded-full border border-line lg:hidden"
         >
           {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
         </button>
       </div>
 
       {open && (
-        <div className="mx-auto mt-2 max-w-[1600px] rounded-3xl border border-line bg-paper/95 p-4 backdrop-blur-xl lg:hidden">
+        <div className="relative z-[201] mx-auto mt-2 max-w-[1600px] rounded-3xl border border-line bg-paper/95 p-4 backdrop-blur-xl lg:hidden">
           <nav className="flex flex-col">
             {links.map((l) => (
               <a

@@ -297,7 +297,11 @@ body {
   background: var(--line);
 }
 
-/* ScrollSmoother wrappers */
+/* Native horizontal scroll for Process on touch */
+.touch-pan-x {
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-x: contain;
+}
 #smooth-wrapper {
   overflow: hidden;
 }

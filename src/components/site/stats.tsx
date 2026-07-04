@@ -1,7 +1,8 @@
 "use client";
 
 import { useRef } from "react";
-import { gsap, useGSAP } from "@/lib/gsap";
+import { gsap, ScrollTrigger, useGSAP } from "@/lib/gsap";
+import { isTouchDevice, prefersReducedMotion } from "@/lib/device";
 
 const stats = [
   { value: 9800, suffix: "+", label: "Trees safely felled", format: true },
@@ -15,32 +16,64 @@ export function Stats() {
 
   useGSAP(
     () => {
-      gsap.utils.toArray<HTMLElement>(".stat-num").forEach((el) => {
-        const end = Number(el.dataset.value);
-        const decimals = Number(el.dataset.decimals ?? 0);
-        const format = el.dataset.format === "true";
-        const obj = { v: 0 };
-        gsap.to(obj, {
-          v: end,
-          duration: 2,
-          ease: "power2.out",
-          scrollTrigger: { trigger: el, start: "top 88%" },
-          onUpdate: () => {
-            el.textContent = format
-              ? Math.round(obj.v).toLocaleString()
-              : obj.v.toFixed(decimals);
+      const touch = isTouchDevice();
+      const reduce = prefersReducedMotion();
+
+      const runCounters = () => {
+        gsap.utils.toArray<HTMLElement>(".stat-num").forEach((el) => {
+          if (el.dataset.animated === "true") return;
+          el.dataset.animated = "true";
+
+          const end = Number(el.dataset.value);
+          const decimals = Number(el.dataset.decimals ?? 0);
+          const format = el.dataset.format === "true";
+          const obj = { v: 0 };
+
+          gsap.to(obj, {
+            v: end,
+            duration: 2,
+            ease: "power2.out",
+            onUpdate: () => {
+              el.textContent = format
+                ? Math.round(obj.v).toLocaleString()
+                : obj.v.toFixed(decimals);
+            },
+          });
+        });
+      };
+
+      if (touch || reduce) {
+        gsap.set(".stat-item", { opacity: 1, y: 0 });
+        ScrollTrigger.create({
+          trigger: root.current,
+          start: "top 90%",
+          once: true,
+          onEnter: runCounters,
+          invalidateOnRefresh: true,
+        });
+      } else {
+        gsap.from(".stat-item", {
+          y: 40,
+          opacity: 0,
+          stagger: 0.12,
+          duration: 0.9,
+          ease: "power3.out",
+          scrollTrigger: {
+            trigger: root.current,
+            start: "top 82%",
+            once: true,
+            invalidateOnRefresh: true,
+            onEnter: runCounters,
           },
         });
-      });
+      }
 
-      gsap.from(".stat-item", {
-        y: 40,
-        opacity: 0,
-        stagger: 0.12,
-        duration: 0.9,
-        ease: "power3.out",
-        scrollTrigger: { trigger: root.current, start: "top 82%" },
-      });
+      if (touch) {
+        const refresh = () => ScrollTrigger.refresh();
+        requestAnimationFrame(refresh);
+        window.setTimeout(refresh, 500);
+        window.setTimeout(refresh, 1500);
+      }
     },
     { scope: root },
   );
