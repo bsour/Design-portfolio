@@ -2,6 +2,7 @@
 
 import { useRef } from "react";
 import { ScrollSmoother, ScrollTrigger, useGSAP } from "@/lib/gsap";
+import { useNativeScroll } from "@/lib/device";
 import { handleAnchorClick } from "@/lib/scroll-to";
 
 export function SmoothScroll({ children }: { children: React.ReactNode }) {
@@ -9,9 +10,8 @@ export function SmoothScroll({ children }: { children: React.ReactNode }) {
   const content = useRef<HTMLDivElement>(null);
 
   useGSAP(() => {
-    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const native = useNativeScroll();
 
-    // Always start at hero on refresh — never restore a prior section hash.
     if ("scrollRestoration" in history) {
       history.scrollRestoration = "manual";
     }
@@ -21,10 +21,24 @@ export function SmoothScroll({ children }: { children: React.ReactNode }) {
     window.scrollTo(0, 0);
     wrapper.current?.scrollTo(0, 0);
 
+    if (native) {
+      wrapper.current?.classList.add("is-native-scroll");
+    }
+
     document.addEventListener("click", handleAnchorClick);
 
-    if (reduce) {
-      return () => document.removeEventListener("click", handleAnchorClick);
+    const refresh = () => ScrollTrigger.refresh();
+
+    if (native) {
+      requestAnimationFrame(refresh);
+      window.addEventListener("load", refresh);
+      window.addEventListener("resize", refresh);
+
+      return () => {
+        document.removeEventListener("click", handleAnchorClick);
+        window.removeEventListener("load", refresh);
+        window.removeEventListener("resize", refresh);
+      };
     }
 
     const smoother = ScrollSmoother.create({

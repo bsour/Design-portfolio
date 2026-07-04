@@ -4,6 +4,7 @@ import { useRef } from "react";
 import Image from "next/image";
 import { ArrowDownRight } from "lucide-react";
 import { gsap, SplitText, useGSAP } from "@/lib/gsap";
+import { isTouchDevice, prefersReducedMotion } from "@/lib/device";
 import { Magnetic } from "./magnetic";
 import { LinkButton } from "./link-button";
 import { img } from "@/lib/images";
@@ -14,47 +15,73 @@ export function Hero() {
 
   useGSAP(
     () => {
-      const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-      const canHover = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
+      const reduce = prefersReducedMotion();
+      const touch = isTouchDevice();
+      const canHover = !touch;
 
-      const split = new SplitText(".hero-h1", { type: "lines", linesClass: "u-line" });
-      // wrap each line in a mask
-      split.lines.forEach((l) => {
-        const mask = document.createElement("span");
-        mask.className = "u-mask";
-        l.parentNode?.insertBefore(mask, l);
-        mask.appendChild(l);
-      });
+      // Never leave the hero hidden — critical for mobile if GSAP hiccups
+      gsap.set(root.current, { autoAlpha: 1, visibility: "visible" });
 
-      const tl = gsap.timeline({ defaults: { ease: "power4.out" } });
+      let split: SplitText | null = null;
+      try {
+        split = new SplitText(".hero-h1", { type: "lines", linesClass: "u-line" });
+        split.lines.forEach((l) => {
+          const mask = document.createElement("span");
+          mask.className = "u-mask";
+          l.parentNode?.insertBefore(mask, l);
+          mask.appendChild(l);
+        });
+      } catch {
+        split = null;
+      }
 
       if (!reduce) {
-        tl.set(root.current, { autoAlpha: 1 })
-          .from(".hero-frame", {
+        const tl = gsap.timeline({ defaults: { ease: "power4.out" } });
+
+        if (touch) {
+          // Lighter entrance for touch — no clip-path (can stick on mobile Safari)
+          tl.from(".hero-image-color", {
+            scale: 1.08,
+            opacity: 0,
+            duration: 1.1,
+            ease: "power3.out",
+          });
+          if (split?.lines.length) {
+            tl.from(
+              split.lines,
+              { y: 28, opacity: 0, duration: 0.85, stagger: 0.08 },
+              "-=0.65",
+            );
+          }
+          tl.from(
+            ".hero-fade",
+            { y: 18, opacity: 0, stagger: 0.08, duration: 0.75 },
+            "-=0.55",
+          );
+        } else {
+          tl.from(".hero-frame", {
             clipPath: "inset(100% 0% 0% 0%)",
             duration: 1.4,
             ease: "power4.inOut",
           })
-          .from(
-            ".hero-image-color",
-            { scale: 1.35, duration: 1.6, ease: "power3.out" },
-            "<",
-          )
-          .from(
-            split.lines,
-            { yPercent: 115, duration: 1.1, stagger: 0.12 },
-            "-=0.9",
-          )
-          .from(
-            ".hero-fade",
-            { y: 24, opacity: 0, stagger: 0.1, duration: 0.9 },
-            "-=0.8",
-          );
-      } else {
-        gsap.set(root.current, { autoAlpha: 1 });
+            .from(
+              ".hero-image-color",
+              { scale: 1.35, duration: 1.6, ease: "power3.out" },
+              "<",
+            )
+            .from(
+              split?.lines ?? [],
+              { yPercent: 115, duration: 1.1, stagger: 0.12 },
+              "-=0.9",
+            )
+            .from(
+              ".hero-fade",
+              { y: 24, opacity: 0, stagger: 0.1, duration: 0.9 },
+              "-=0.8",
+            );
+        }
       }
 
-      // Parallax the hero photo via ScrollTrigger (reliable with fill images)
       if (!reduce) {
         gsap.fromTo(
           ".hero-parallax",
@@ -67,16 +94,23 @@ export function Hero() {
               start: "top top",
               end: "bottom top",
               scrub: true,
+              invalidateOnRefresh: true,
             },
           },
         );
       }
 
-      // Globe spotlight — B&W inside the orb, smooth cursor follow
+      // Globe spotlight — desktop only
       if (!reduce && canHover && frame.current && root.current) {
         const el = frame.current;
         const section = root.current;
         const spot = { x: 0, y: 0, o: 0 };
+
+        const syncFrame = () => {
+          const rect = el.getBoundingClientRect();
+          el.style.setProperty("--frame-w", `${rect.width}px`);
+          el.style.setProperty("--frame-h", `${rect.height}px`);
+        };
 
         const paint = () => {
           el.style.setProperty("--spot-x", `${spot.x}px`);
@@ -84,13 +118,33 @@ export function Hero() {
           el.style.setProperty("--spot-opacity", String(spot.o));
         };
 
+        syncFrame();
+        window.addEventListener("resize", syncFrame);
+
+        const turb = el.querySelector("#hero-wave-distort feTurbulence");
+        if (turb) {
+          gsap.to(turb, {
+            attr: { seed: 40 },
+            duration: 7,
+            repeat: -1,
+            ease: "none",
+          });
+          gsap.to(turb, {
+            attr: { baseFrequency: 0.07 },
+            duration: 4.5,
+            repeat: -1,
+            yoyo: true,
+            ease: "sine.inOut",
+          });
+        }
+
         const onMove = (e: MouseEvent) => {
           const rect = el.getBoundingClientRect();
           gsap.to(spot, {
             x: e.clientX - rect.left,
             y: e.clientY - rect.top,
-            o: 1,
-            duration: 0.55,
+            o: 0.38,
+            duration: 0.7,
             ease: "power3.out",
             onUpdate: paint,
             overwrite: "auto",
@@ -99,7 +153,7 @@ export function Hero() {
         const onLeave = () => {
           gsap.to(spot, {
             o: 0,
-            duration: 0.35,
+            duration: 0.45,
             ease: "power2.out",
             onUpdate: paint,
             overwrite: "auto",
@@ -110,13 +164,15 @@ export function Hero() {
         section.addEventListener("mouseleave", onLeave);
 
         return () => {
+          window.removeEventListener("resize", syncFrame);
           section.removeEventListener("mousemove", onMove);
           section.removeEventListener("mouseleave", onLeave);
-          split.revert();
+          if (turb) gsap.killTweensOf(turb);
+          split?.revert();
         };
       }
 
-      return () => split.revert();
+      return () => split?.revert();
     },
     { scope: root },
   );
@@ -124,41 +180,63 @@ export function Hero() {
   return (
     <section
       ref={root}
-      className="relative flex min-h-dvh flex-col justify-end pb-10 pt-28 opacity-0"
+      className="relative flex min-h-dvh flex-col justify-end pb-10 pt-28"
     >
       {/* Full-bleed graded photograph with parallax + globe spotlight */}
       <div
         ref={frame}
-        className="hero-frame grain absolute inset-0 -z-10 overflow-hidden bg-forest"
+        className="hero-frame grain absolute inset-0 -z-10 h-full min-h-full overflow-hidden bg-forest"
       >
-        <div className="hero-parallax absolute inset-x-0 -inset-y-[8%] w-full">
-          <Image
-            src={img.heroForest}
-            alt=""
-            fill
-            priority
-            sizes="100vw"
-            aria-hidden
-            className="hero-image-color object-cover [filter:saturate(0.85)_contrast(1.03)_brightness(0.97)]"
-          />
-          {/* grade overlay (replaces .media::after) */}
-          <div className="pointer-events-none absolute inset-0 bg-forest/15 mix-blend-multiply" />
-        </div>
-
-        {/* B&W layer revealed inside the globe orb */}
-        <div className="hero-spotlight hero-parallax absolute inset-x-0 -inset-y-[8%] w-full">
+        <div className="hero-parallax absolute inset-0 h-full w-full min-h-full">
           <Image
             src={img.heroForest}
             alt="Misty old-growth forest at dawn"
             fill
             priority
             sizes="100vw"
-            className="object-cover"
+            className="hero-image-color object-cover [filter:saturate(0.85)_contrast(1.03)_brightness(0.97)]"
           />
+          <div className="pointer-events-none absolute inset-0 bg-forest/15 mix-blend-multiply" />
         </div>
 
-        {/* Globe shadow ring */}
-        <div className="hero-globe-ring z-[3]" aria-hidden />
+        {/* Wave-distort filter for living blob edges (desktop) */}
+        <svg className="absolute h-0 w-0" aria-hidden>
+          <defs>
+            <filter id="hero-wave-distort">
+              <feTurbulence
+                type="fractalNoise"
+                baseFrequency="0.04"
+                numOctaves="2"
+                seed="0"
+                result="noise"
+              />
+              <feDisplacementMap
+                in="SourceGraphic"
+                in2="noise"
+                scale="2.5"
+                xChannelSelector="R"
+                yChannelSelector="G"
+              />
+            </filter>
+          </defs>
+        </svg>
+
+        {/* Small morphing blob — B&W inside, desktop only */}
+        <div className="hero-spotlight-blob" aria-hidden>
+          <div className="hero-spotlight-inner">
+            <div className="hero-parallax absolute inset-0 h-full w-full min-h-full">
+              <Image
+                src={img.heroForest}
+                alt=""
+                fill
+                priority
+                sizes="100vw"
+                aria-hidden
+                className="object-cover"
+              />
+            </div>
+          </div>
+        </div>
 
         {/* legibility scrim */}
         <div className="absolute inset-0 z-[2] bg-gradient-to-t from-paper via-paper/40 to-transparent" />
