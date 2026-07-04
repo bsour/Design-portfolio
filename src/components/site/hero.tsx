@@ -106,7 +106,7 @@ export function Hero() {
           <span className="hidden sm:block">Victoria, Australia · Est. 2004</span>
         </div>
 
-        <div className="liquid-glass mt-10 p-6 sm:p-8 md:mt-12 md:p-12">
+        <div className="liquid-glass-dark mt-10 p-6 sm:p-8 md:mt-12 md:p-12">
           <div className="grid gap-10 lg:grid-cols-[1.5fr_1fr] lg:items-end">
           <div>
             <p className="eyebrow hero-fade mb-7 flex items-center gap-3">

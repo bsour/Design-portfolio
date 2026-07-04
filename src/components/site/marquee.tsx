@@ -30,7 +30,7 @@ export function Marquee() {
   );
 
   return (
-    <div className="relative overflow-hidden border-y border-line bg-forest py-6 text-paper">
+    <div className="relative overflow-hidden border-y border-line bg-forest py-6 text-ink">
       <div ref={track} className="flex w-max shrink-0">
         {[...items, ...items].map((it, i) => (
           <div key={i} className="flex shrink-0 items-center">

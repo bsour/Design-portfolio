@@ -42,7 +42,7 @@ function Tile({ p }: { p: Project }) {
             className="object-cover transition-transform duration-[1.2s] ease-out group-hover:scale-105"
           />
         </div>
-        <span className="absolute right-4 top-4 z-10 grid h-11 w-11 translate-y-2 place-items-center rounded-full bg-paper text-ink opacity-0 transition-all duration-500 group-hover:translate-y-0 group-hover:opacity-100">
+        <span className="absolute right-4 top-4 z-10 grid h-11 w-11 translate-y-2 place-items-center rounded-full bg-clay text-paper opacity-0 transition-all duration-500 group-hover:translate-y-0 group-hover:opacity-100">
           <ArrowUpRight className="h-5 w-5" />
         </span>
       </div>

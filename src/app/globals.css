@@ -1,22 +1,23 @@
 @import "tailwindcss";
 
 /* ================================================================== *
- * IRONBARK — editorial design system
- * Warm paper, ink, deep forest, burnt clay. Studio / gallery feel.
+ * IRONBARK — editorial design system (DARK)
+ * Near-black warm ground, off-white ink, deep pine + burnt-clay accent.
+ * Same layout / typography / motion as the editorial build, dark skin.
  * ================================================================== */
 :root {
-  --paper: #e9e3d5; /* warm bone background */
-  --paper-2: #e1dac9;
-  --paper-3: #d7cfba;
-  --ink: #16130d; /* near-black */
-  --ink-soft: #55503f;
-  --ink-mute: #837c68;
-  --forest: #1e3527; /* deep pine */
+  --paper: #0a0b07; /* near-black warm ground (page bg) */
+  --paper-2: #101109; /* raised surface */
+  --paper-3: #17190f; /* card / panel */
+  --ink: #ede8db; /* warm off-white (primary text) */
+  --ink-soft: #b1aa93;
+  --ink-mute: #7d7663;
+  --forest: #22402f; /* deep pine accent band */
   --forest-2: #2c4a36;
-  --clay: #b8501f; /* burnt orange accent */
-  --clay-soft: #c9713f;
-  --line: rgba(22, 19, 13, 0.16);
-  --line-soft: rgba(22, 19, 13, 0.08);
+  --clay: #dd6329; /* burnt orange accent (brighter for dark) */
+  --clay-soft: #e8804f;
+  --line: rgba(237, 232, 219, 0.12);
+  --line-soft: rgba(237, 232, 219, 0.06);
 
   --radius: 0.4rem;
 }
@@ -63,20 +64,8 @@ body {
 }
 
 ::selection {
-  background: var(--forest);
-  color: var(--paper);
-}
-
-/* Hide native cursor on precise pointers (custom cursor takes over) */
-@media (hover: hover) and (pointer: fine) {
-  body {
-    cursor: none;
-  }
-  a,
-  button,
-  [data-cursor] {
-    cursor: none;
-  }
+  background: var(--clay);
+  color: #0a0b07;
 }
 
 /* ------------------------------------------------------------------ *
@@ -234,31 +223,6 @@ body {
   height: 1px;
   width: 100%;
   background: var(--line);
-}
-
-/* Custom cursor */
-.cursor-dot,
-.cursor-ring {
-  position: fixed;
-  top: 0;
-  left: 0;
-  z-index: 9999;
-  pointer-events: none;
-  border-radius: 999px;
-  will-change: transform;
-}
-.cursor-dot {
-  width: 6px;
-  height: 6px;
-  background: var(--clay);
-  margin: -3px 0 0 -3px;
-}
-.cursor-ring {
-  width: 40px;
-  height: 40px;
-  margin: -20px 0 0 -20px;
-  border: 1px solid var(--ink);
-  mix-blend-mode: difference;
 }
 
 /* ScrollSmoother wrappers */

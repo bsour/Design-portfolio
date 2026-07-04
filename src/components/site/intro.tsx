@@ -45,7 +45,7 @@ export function Intro() {
               className="object-cover"
             />
           </div>
-          <span className="liquid-glass-chip absolute bottom-5 left-5 z-10 px-3.5 py-2 font-mono text-[0.65rem] uppercase tracking-[0.2em] text-paper">
+          <span className="liquid-glass-chip absolute bottom-5 left-5 z-10 px-3.5 py-2 font-mono text-[0.65rem] uppercase tracking-[0.2em] text-ink">
             Fig. 01 — Selective harvest
           </span>
         </div>

@@ -1,4 +1,3 @@
-import { Cursor } from "@/components/site/cursor";
 import { Navbar } from "@/components/site/navbar";
 import { SmoothScroll } from "@/components/site/smooth-scroll";
 import { Hero } from "@/components/site/hero";
@@ -16,7 +15,6 @@ import { Footer } from "@/components/site/footer";
 export default function Home() {
   return (
     <>
-      <Cursor />
       <Navbar />
       <SmoothScroll>
         <main id="top" className="relative">

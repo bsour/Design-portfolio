@@ -46,7 +46,7 @@ export function Stats() {
   );
 
   return (
-    <section ref={root} className="relative border-y border-line bg-forest py-20 text-paper md:py-28">
+    <section ref={root} className="relative border-y border-line bg-forest py-20 text-ink md:py-28">
       <div className="mx-auto grid max-w-[1600px] grid-cols-2 gap-y-12 px-6 md:grid-cols-4 md:px-12">
         {stats.map((s) => (
           <div key={s.label} className="stat-item">
@@ -61,7 +61,7 @@ export function Stats() {
               </span>
               <span className="text-clay-soft">{s.suffix}</span>
             </div>
-            <span className="mt-3 block max-w-[11rem] font-mono text-[0.68rem] uppercase tracking-[0.16em] text-paper/60">
+            <span className="mt-3 block max-w-[11rem] font-mono text-[0.68rem] uppercase tracking-[0.16em] text-ink/55">
               {s.label}
             </span>
           </div>
