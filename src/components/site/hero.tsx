@@ -5,7 +5,7 @@ import Image from "next/image";
 import { ArrowDownRight } from "lucide-react";
 import { gsap, SplitText, useGSAP } from "@/lib/gsap";
 import { Magnetic } from "./magnetic";
-import { Button } from "@/components/ui/button";
+import { LinkButton } from "./link-button";
 import { img } from "@/lib/images";
 
 export function Hero() {
@@ -192,15 +192,15 @@ export function Hero() {
             </p>
             <div className="hero-fade flex flex-wrap items-center gap-4">
               <Magnetic strength={0.5}>
-                <Button size="lg" variant="solid">
+                <LinkButton href="#contact" size="lg" variant="solid">
                   Start a project
                   <ArrowDownRight className="h-4 w-4 transition-transform duration-500 group-hover:rotate-45" />
-                </Button>
+                </LinkButton>
               </Magnetic>
               <Magnetic strength={0.35}>
-                <Button size="lg" variant="outline">
+                <LinkButton href="#work" size="lg" variant="outline">
                   View our work
-                </Button>
+                </LinkButton>
               </Magnetic>
             </div>
           </div>

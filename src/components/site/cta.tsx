@@ -4,7 +4,7 @@ import { useRef } from "react";
 import Image from "next/image";
 import { ArrowUpRight } from "lucide-react";
 import { gsap, SplitText, useGSAP } from "@/lib/gsap";
-import { Button } from "@/components/ui/button";
+import { LinkButton } from "./link-button";
 import { Magnetic } from "./magnetic";
 import { img } from "@/lib/images";
 
@@ -34,6 +34,7 @@ export function CTA() {
 
   return (
     <section
+      id="contact"
       ref={root}
       className="media grain relative flex min-h-[92vh] items-center overflow-hidden text-ink"
     >
@@ -66,19 +67,20 @@ export function CTA() {
           </p>
           <div className="flex flex-wrap items-center gap-4">
             <Magnetic strength={0.5}>
-              <Button size="lg" variant="clay">
+              <LinkButton href="mailto:hello@ironbark.co" size="lg" variant="clay">
                 Start a project
                 <ArrowUpRight className="h-4 w-4 transition-transform duration-500 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
-              </Button>
+              </LinkButton>
             </Magnetic>
             <Magnetic strength={0.35}>
-              <Button
+              <LinkButton
+                href="tel:18004766227"
                 size="lg"
                 variant="outline"
                 className="border-ink/40 text-ink hover:bg-ink hover:text-paper"
               >
                 Call 1800 IRONBARK
-              </Button>
+              </LinkButton>
             </Magnetic>
           </div>
         </div>

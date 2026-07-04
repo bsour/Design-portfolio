@@ -1,15 +1,32 @@
 const cols = [
   {
     heading: "Services",
-    links: ["Precision Felling", "Timber Harvesting", "Land Clearing", "Stump Grinding", "Storm Response"],
+    links: [
+      { label: "Precision Felling", href: "#services" },
+      { label: "Timber Harvesting", href: "#services" },
+      { label: "Land Clearing", href: "#services" },
+      { label: "Stump Grinding", href: "#services" },
+      { label: "Storm Response", href: "#services" },
+    ],
   },
   {
     heading: "Studio",
-    links: ["About", "Our Crew", "Safety", "Careers", "Journal"],
+    links: [
+      { label: "About", href: "#studio" },
+      { label: "Our Crew", href: "#studio" },
+      { label: "Safety", href: "#process" },
+      { label: "Careers", href: "#studio" },
+      { label: "Journal", href: "#studio" },
+    ],
   },
   {
     heading: "Contact",
-    links: ["1800 IRONBARK", "hello@ironbark.co", "Yarra Valley, VIC", "Mon–Sat · 6am–6pm"],
+    links: [
+      { label: "1800 IRONBARK", href: "tel:18004766227" },
+      { label: "hello@ironbark.co", href: "mailto:hello@ironbark.co" },
+      { label: "Yarra Valley, VIC", href: "#studio" },
+      { label: "Mon–Sat · 6am–6pm", href: "#contact" },
+    ],
   },
 ];
 
@@ -33,13 +50,12 @@ export function Footer() {
               <h4 className="eyebrow">{c.heading}</h4>
               <ul className="mt-5 space-y-3">
                 {c.links.map((l) => (
-                  <li key={l}>
+                  <li key={l.label}>
                     <a
-                      href="#"
+                      href={l.href}
                       className="text-sm text-ink-soft transition-colors hover:text-clay"
-                      data-cursor="hover"
                     >
-                      {l}
+                      {l.label}
                     </a>
                   </li>
                 ))}

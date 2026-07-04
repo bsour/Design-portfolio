@@ -2,6 +2,7 @@
 
 import { useRef } from "react";
 import { ScrollSmoother, ScrollTrigger, useGSAP } from "@/lib/gsap";
+import { handleAnchorClick } from "@/lib/scroll-to";
 
 export function SmoothScroll({ children }: { children: React.ReactNode }) {
   const wrapper = useRef<HTMLDivElement>(null);
@@ -18,7 +19,22 @@ export function SmoothScroll({ children }: { children: React.ReactNode }) {
     window.scrollTo(0, 0);
     wrapper.current?.scrollTo(0, 0);
 
-    if (reduce) return;
+    document.addEventListener("click", handleAnchorClick);
+
+    if (reduce) {
+      const hash = window.location.hash;
+      if (hash.length > 1) {
+        requestAnimationFrame(() => {
+          const target = document.querySelector(hash);
+          if (target) {
+            const top =
+              target.getBoundingClientRect().top + window.scrollY - 88;
+            window.scrollTo(0, top);
+          }
+        });
+      }
+      return () => document.removeEventListener("click", handleAnchorClick);
+    }
 
     const smoother = ScrollSmoother.create({
       wrapper: wrapper.current!,
@@ -31,11 +47,22 @@ export function SmoothScroll({ children }: { children: React.ReactNode }) {
     smoother.scrollTop(0);
     ScrollTrigger.refresh();
 
-    // Recalculate pin/parallax distances once images finish loading
+    // Scroll to hash target on load (e.g. /#services)
+    const hash = window.location.hash;
+    if (hash.length > 1) {
+      requestAnimationFrame(() => {
+        const target = document.querySelector(hash);
+        if (target) smoother.scrollTo(target, false, "top 88px");
+      });
+    }
+
+    document.addEventListener("click", handleAnchorClick);
+
     const onLoad = () => ScrollTrigger.refresh();
     window.addEventListener("load", onLoad);
 
     return () => {
+      document.removeEventListener("click", handleAnchorClick);
       window.removeEventListener("load", onLoad);
       smoother.kill();
     };

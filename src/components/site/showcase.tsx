@@ -28,7 +28,7 @@ const projects: Project[] = [
 function Tile({ p }: { p: Project }) {
   return (
     <a
-      href="#"
+      href="#work"
       className={cn("project-tile group block", p.offset)}
       data-cursor="hover"
     >

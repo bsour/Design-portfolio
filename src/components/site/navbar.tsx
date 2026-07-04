@@ -3,7 +3,7 @@
 import { useRef, useState } from "react";
 import { Menu, X } from "lucide-react";
 import { gsap, ScrollTrigger, useGSAP } from "@/lib/gsap";
-import { Button } from "@/components/ui/button";
+import { LinkButton } from "./link-button";
 import { Magnetic } from "./magnetic";
 import { cn } from "@/lib/utils";
 
@@ -69,9 +69,9 @@ export function Navbar() {
 
         <div className="hidden lg:block">
           <Magnetic strength={0.4}>
-            <Button size="sm" variant="clay">
+            <LinkButton href="#contact" size="sm" variant="clay">
               Get a quote
-            </Button>
+            </LinkButton>
           </Magnetic>
         </div>
 
@@ -97,9 +97,9 @@ export function Navbar() {
                 {l.label}
               </a>
             ))}
-            <Button variant="clay" className="mt-3 w-full">
+            <LinkButton href="#contact" variant="clay" className="mt-3 w-full">
               Get a quote
-            </Button>
+            </LinkButton>
           </nav>
         </div>
       )}
