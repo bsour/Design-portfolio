@@ -1,26 +1,275 @@
 @import "tailwindcss";
 
+/* ================================================================== *
+ * IRONBARK — editorial design system
+ * Warm paper, ink, deep forest, burnt clay. Studio / gallery feel.
+ * ================================================================== */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --paper: #e9e3d5; /* warm bone background */
+  --paper-2: #e1dac9;
+  --paper-3: #d7cfba;
+  --ink: #16130d; /* near-black */
+  --ink-soft: #55503f;
+  --ink-mute: #837c68;
+  --forest: #1e3527; /* deep pine */
+  --forest-2: #2c4a36;
+  --clay: #b8501f; /* burnt orange accent */
+  --clay-soft: #c9713f;
+  --line: rgba(22, 19, 13, 0.16);
+  --line-soft: rgba(22, 19, 13, 0.08);
+
+  --radius: 0.4rem;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-paper: var(--paper);
+  --color-paper-2: var(--paper-2);
+  --color-paper-3: var(--paper-3);
+  --color-ink: var(--ink);
+  --color-ink-soft: var(--ink-soft);
+  --color-ink-mute: var(--ink-mute);
+  --color-forest: var(--forest);
+  --color-forest-2: var(--forest-2);
+  --color-clay: var(--clay);
+  --color-clay-soft: var(--clay-soft);
+  --color-line: var(--line);
+
+  --color-background: var(--paper);
+  --color-foreground: var(--ink);
+
+  --font-sans: "Geist", "Geist Fallback", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "Geist Mono", "Geist Mono Fallback", ui-monospace, monospace;
+  --font-display: var(--font-fraunces), Georgia, "Times New Roman", serif;
+
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-io: cubic-bezier(0.65, 0, 0.35, 1);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+* {
+  border-color: var(--line);
+}
+
+html {
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  overflow-x: hidden;
+  font-feature-settings: "ss01";
+}
+
+::selection {
+  background: var(--forest);
+  color: var(--paper);
+}
+
+/* Hide native cursor on precise pointers (custom cursor takes over) */
+@media (hover: hover) and (pointer: fine) {
+  body {
+    cursor: none;
+  }
+  a,
+  button,
+  [data-cursor] {
+    cursor: none;
+  }
+}
+
+/* ------------------------------------------------------------------ *
+ * Typography helpers
+ * ------------------------------------------------------------------ */
+.font-display {
+  font-family: var(--font-display);
+  font-optical-sizing: auto;
+  letter-spacing: -0.02em;
+}
+
+.display-xl {
+  font-family: var(--font-display);
+  font-weight: 500;
+  line-height: 0.92;
+  letter-spacing: -0.035em;
+}
+
+.eyebrow {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.28em;
+  color: var(--ink-mute);
+}
+
+.italic-accent {
+  font-style: italic;
+  font-weight: 400;
+}
+
+.text-balance {
+  text-wrap: balance;
+}
+
+/* Line-mask reveal: wrap lines in .u-mask, animate child .u-line */
+.u-mask {
+  overflow: hidden;
+  display: block;
+}
+
+/* ------------------------------------------------------------------ *
+ * Image treatment — refined grade, not neon
+ * ------------------------------------------------------------------ */
+.media {
+  position: relative;
+  overflow: hidden;
+  background: var(--forest);
+}
+.media img {
+  filter: saturate(0.82) contrast(1.03) brightness(0.98);
+}
+.media::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    180deg,
+    rgba(30, 53, 39, 0.12) 0%,
+    rgba(22, 19, 13, 0.05) 40%,
+    rgba(22, 19, 13, 0.25) 100%
+  );
+  mix-blend-mode: multiply;
+}
+
+/* Film grain overlay */
+.grain::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  opacity: 0.04;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* ------------------------------------------------------------------ *
+ * Liquid glass — NEUTRAL frosted panels for text sitting over imagery.
+ * No colour tint / no hue: only a blur of the photo behind + a thin
+ * specular rim, so readability improves without changing the palette.
+ * ------------------------------------------------------------------ */
+.liquid-glass,
+.liquid-glass-dark {
+  position: relative;
+  isolation: isolate;
+  border-radius: 1.5rem;
+  -webkit-backdrop-filter: blur(22px) saturate(120%);
+  backdrop-filter: blur(22px) saturate(120%);
+  overflow: hidden;
+}
+
+/* for dark text over bright imagery — a faint clear-white frost */
+.liquid-glass {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow:
+    0 20px 60px -30px rgba(22, 19, 13, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5);
+}
+
+/* for light text over dark imagery — a faint neutral (no-hue) frost */
+.liquid-glass-dark {
+  background: rgba(8, 8, 6, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  box-shadow:
+    0 20px 60px -30px rgba(0, 0, 0, 0.55),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+/* specular sweep — the "liquid" highlight */
+.liquid-glass::before,
+.liquid-glass-dark::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: linear-gradient(
+    120deg,
+    rgba(255, 255, 255, 0.2) 0%,
+    rgba(255, 255, 255, 0) 30%,
+    rgba(255, 255, 255, 0) 70%,
+    rgba(255, 255, 255, 0.08) 100%
+  );
+}
+
+/* small inline glass chip for captions/labels over images */
+.liquid-glass-chip {
+  -webkit-backdrop-filter: blur(12px) saturate(120%);
+  backdrop-filter: blur(12px) saturate(120%);
+  background: rgba(8, 8, 6, 0.28);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 999px;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+/* graceful fallback where backdrop-filter is unsupported */
+@supports not (
+  (backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))
+) {
+  .liquid-glass {
+    background: rgba(233, 227, 213, 0.86);
+  }
+  .liquid-glass-dark {
+    background: rgba(8, 8, 6, 0.72);
+  }
+  .liquid-glass-chip {
+    background: rgba(8, 8, 6, 0.7);
+  }
+}
+
+/* Hairline rule */
+.rule {
+  height: 1px;
+  width: 100%;
+  background: var(--line);
+}
+
+/* Custom cursor */
+.cursor-dot,
+.cursor-ring {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 9999;
+  pointer-events: none;
+  border-radius: 999px;
+  will-change: transform;
+}
+.cursor-dot {
+  width: 6px;
+  height: 6px;
+  background: var(--clay);
+  margin: -3px 0 0 -3px;
+}
+.cursor-ring {
+  width: 40px;
+  height: 40px;
+  margin: -20px 0 0 -20px;
+  border: 1px solid var(--ink);
+  mix-blend-mode: difference;
+}
+
+/* ScrollSmoother wrappers */
+#smooth-wrapper {
+  overflow: hidden;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.001ms !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
 }
