@@ -27,5 +27,4 @@ export function handleAnchorClick(event: MouseEvent) {
 
   event.preventDefault();
   scrollToSection(href);
-  history.pushState(null, "", href);
 }

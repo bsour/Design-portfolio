@@ -11,10 +11,12 @@ export function SmoothScroll({ children }: { children: React.ReactNode }) {
   useGSAP(() => {
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-    // Browser scroll restoration fights ScrollSmoother's wrapper scroll and
-    // can land the page mid-way (often on a pinned section like Process).
+    // Always start at hero on refresh — never restore a prior section hash.
     if ("scrollRestoration" in history) {
       history.scrollRestoration = "manual";
+    }
+    if (window.location.hash) {
+      history.replaceState(null, "", window.location.pathname + window.location.search);
     }
     window.scrollTo(0, 0);
     wrapper.current?.scrollTo(0, 0);
@@ -22,17 +24,6 @@ export function SmoothScroll({ children }: { children: React.ReactNode }) {
     document.addEventListener("click", handleAnchorClick);
 
     if (reduce) {
-      const hash = window.location.hash;
-      if (hash.length > 1) {
-        requestAnimationFrame(() => {
-          const target = document.querySelector(hash);
-          if (target) {
-            const top =
-              target.getBoundingClientRect().top + window.scrollY - 88;
-            window.scrollTo(0, top);
-          }
-        });
-      }
       return () => document.removeEventListener("click", handleAnchorClick);
     }
 
@@ -47,18 +38,10 @@ export function SmoothScroll({ children }: { children: React.ReactNode }) {
     smoother.scrollTop(0);
     ScrollTrigger.refresh();
 
-    // Scroll to hash target on load (e.g. /#services)
-    const hash = window.location.hash;
-    if (hash.length > 1) {
-      requestAnimationFrame(() => {
-        const target = document.querySelector(hash);
-        if (target) smoother.scrollTo(target, false, "top 88px");
-      });
-    }
-
-    document.addEventListener("click", handleAnchorClick);
-
-    const onLoad = () => ScrollTrigger.refresh();
+    const onLoad = () => {
+      smoother.scrollTop(0);
+      ScrollTrigger.refresh();
+    };
     window.addEventListener("load", onLoad);
 
     return () => {

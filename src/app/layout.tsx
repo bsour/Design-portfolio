@@ -46,7 +46,7 @@ export default function RootLayout({
     >
       <body className="min-h-dvh bg-paper text-ink">
         <Script id="scroll-restoration" strategy="beforeInteractive">
-          {`history.scrollRestoration='manual';window.scrollTo(0,0);`}
+          {`history.scrollRestoration='manual';if(location.hash)history.replaceState(null,'',location.pathname+location.search);window.scrollTo(0,0);`}
         </Script>
         {children}
       </body>
