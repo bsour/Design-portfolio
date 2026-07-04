@@ -43,35 +43,49 @@ export function Process() {
     () => {
       const reduce = prefersReducedMotion();
       const touch = isTouchDevice();
-      if (reduce || touch) return;
 
-      const el = track.current!;
-      const distance = () => Math.max(el.scrollWidth - window.innerWidth, 0);
+      const mm = gsap.matchMedia();
 
-      gsap.to(el, {
-        x: () => -distance(),
-        ease: "none",
-        scrollTrigger: {
-          trigger: root.current,
-          start: "top top",
-          end: () => "+=" + distance(),
-          pin: true,
-          scrub: 1,
-          invalidateOnRefresh: true,
-        },
+      // Must match the CSS `lg:` breakpoint exactly — otherwise JS can set up
+      // the desktop pin/horizontal-scroll while CSS renders the mobile swipe
+      // layout (or vice versa), corrupting the pin distance and the layout.
+      mm.add("(min-width: 1024px)", () => {
+        if (reduce || touch) return;
+
+        const el = track.current!;
+        const distance = () => Math.max(el.scrollWidth - window.innerWidth, 0);
+
+        gsap.to(el, {
+          x: () => -distance(),
+          ease: "none",
+          scrollTrigger: {
+            trigger: root.current,
+            start: "top top",
+            end: () => "+=" + distance(),
+            pin: true,
+            scrub: 1,
+            invalidateOnRefresh: true,
+          },
+        });
+
+        gsap.to(".process-progress", {
+          scaleX: 1,
+          ease: "none",
+          scrollTrigger: {
+            trigger: root.current,
+            start: "top top",
+            end: () => "+=" + distance(),
+            scrub: true,
+            invalidateOnRefresh: true,
+          },
+        });
+
+        return () => {
+          gsap.set(el, { clearProps: "transform" });
+        };
       });
 
-      gsap.to(".process-progress", {
-        scaleX: 1,
-        ease: "none",
-        scrollTrigger: {
-          trigger: root.current,
-          start: "top top",
-          end: () => "+=" + distance(),
-          scrub: true,
-          invalidateOnRefresh: true,
-        },
-      });
+      return () => mm.revert();
     },
     { scope: root },
   );
@@ -82,7 +96,7 @@ export function Process() {
       ref={root}
       className="relative border-y border-line bg-paper-2 max-lg:py-24 lg:min-h-dvh lg:overflow-hidden"
     >
-      <div className="pointer-events-none px-6 max-lg:static max-lg:mb-10 md:left-12 lg:absolute lg:left-6 lg:top-28 lg:z-10">
+      <div className="pointer-events-none px-6 max-lg:static max-lg:mb-10 md:left-12 lg:absolute lg:left-6 lg:top-28 lg:z-10 lg:px-0">
         <Badge>The method</Badge>
         <h2 className="mt-5 max-w-md font-display text-4xl font-light leading-[0.95] tracking-tight md:text-6xl">
           A calm site is a <span className="italic-accent text-clay">safe</span>{" "}
@@ -96,24 +110,30 @@ export function Process() {
       <div
         ref={track}
         className={cn(
-          "flex gap-5 px-6 md:gap-10 md:px-12",
+          "flex gap-6 px-6 md:gap-10 md:px-12",
           "max-lg:snap-x max-lg:snap-mandatory max-lg:overflow-x-auto max-lg:pb-6 max-lg:touch-pan-x",
           "lg:h-dvh lg:items-center lg:overflow-visible",
         )}
       >
-        <div className="hidden w-[44vw] shrink-0 md:block md:w-[40vw]" />
+        {/* Leading spacer — desktop horizontal scroll offset only */}
+        <div className="hidden shrink-0 lg:block lg:w-[40vw]" />
 
         {steps.map((s) => (
           <article
             key={s.n}
             className={cn(
-              "group relative flex w-[88vw] shrink-0 snap-center flex-col overflow-hidden rounded-lg border border-line bg-paper",
-              "md:w-[72vw]",
-              "lg:h-[64vh] lg:w-[52vw] lg:flex-row",
-              "xl:w-[40vw]",
+              "group relative flex shrink-0 overflow-hidden rounded-lg border border-line bg-paper",
+              "max-lg:w-[88vw] max-lg:snap-center max-lg:flex-col",
+              "lg:h-[64vh] lg:w-[40vw] lg:flex-row",
             )}
           >
-            <div className="media grain relative shrink-0 overflow-hidden max-lg:aspect-[4/3] max-lg:w-full lg:w-1/2">
+            <div
+              className={cn(
+                "media grain relative shrink-0 overflow-hidden",
+                "max-lg:aspect-[4/3] max-lg:w-full",
+                "lg:h-full lg:w-1/2",
+              )}
+            >
               <Image
                 src={s.image}
                 alt={s.title}
@@ -122,7 +142,7 @@ export function Process() {
                 className="object-cover transition-transform duration-[1.2s] ease-out group-hover:scale-105"
               />
             </div>
-            <div className="flex w-full flex-col justify-between p-6 lg:w-1/2 lg:p-8">
+            <div className="flex w-full flex-col justify-between p-6 lg:h-full lg:w-1/2 lg:p-8">
               <span className="font-display text-5xl font-light text-ink/15 lg:text-7xl">
                 {s.n}
               </span>
