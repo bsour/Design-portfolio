@@ -101,18 +101,15 @@ export function Hero() {
 
       <div className="relative mx-auto w-full max-w-[1600px] px-6 md:px-12">
         {/* top meta row */}
-        <div className="hero-fade mb-auto flex items-center justify-between font-mono text-[0.7rem] uppercase tracking-[0.24em] text-ink-soft">
-          <span>Forestry &amp; Land Studio</span>
-          <span className="hidden sm:block">Victoria, Australia · Est. 2004</span>
+        <div className="hero-fade mb-auto flex justify-end font-mono text-[0.7rem] uppercase tracking-[0.24em]">
+          <span className="bg-clay px-2 py-1 text-[#0a0b07]">
+            Victoria, Australia · Est. 2004
+          </span>
         </div>
 
         <div className="mt-10 md:mt-12">
           <div className="grid gap-10 lg:grid-cols-[1.5fr_1fr] lg:items-end">
           <div>
-            <p className="eyebrow hero-fade mb-7 flex items-center gap-3">
-              <span className="h-px w-10 bg-clay" />
-              Precision tree logging
-            </p>
             <h1 className="hero-h1 display-xl text-[13vw] font-medium leading-[0.9] tracking-[-0.03em] text-ink sm:text-[10vw] lg:text-[6.5rem]">
               We bring down
               <br />
