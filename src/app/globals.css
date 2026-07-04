@@ -297,6 +297,42 @@ body {
   background: var(--line);
 }
 
+/* Marquee ribbon — CSS on touch, GSAP on desktop (fine pointer) */
+@keyframes marquee-scroll {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+@media (hover: none), (pointer: coarse) {
+  .marquee-track {
+    animation: marquee-scroll 28s linear infinite;
+    will-change: transform;
+  }
+}
+
+/* Stats — hardcoded on touch, animated on fine pointer */
+.stats-touch {
+  display: none;
+}
+
+@media (hover: none), (pointer: coarse) {
+  .stats-touch {
+    display: grid;
+  }
+  .stats-desktop {
+    display: none !important;
+  }
+}
+
+/* Keep nav above pinned ScrollTrigger sections on touch */
+#site-nav {
+  isolation: isolate;
+}
+
 /* Native horizontal scroll for Process on touch */
 .touch-pan-x {
   -webkit-overflow-scrolling: touch;
