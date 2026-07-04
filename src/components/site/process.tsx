@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { gsap, useGSAP } from "@/lib/gsap";
 import { isTouchDevice, prefersReducedMotion } from "@/lib/device";
@@ -38,54 +38,47 @@ const steps = [
 export function Process() {
   const root = useRef<HTMLElement>(null);
   const track = useRef<HTMLDivElement>(null);
+  const [touch, setTouch] = useState(false);
+
+  useEffect(() => {
+    setTouch(isTouchDevice());
+  }, []);
 
   useGSAP(
     () => {
-      const reduce = prefersReducedMotion();
-      const touch = isTouchDevice();
+      if (prefersReducedMotion() || isTouchDevice()) return;
 
-      const mm = gsap.matchMedia();
+      const el = track.current!;
+      const distance = () => Math.max(el.scrollWidth - window.innerWidth, 0);
 
-      // Must match the CSS `lg:` breakpoint exactly — otherwise JS can set up
-      // the desktop pin/horizontal-scroll while CSS renders the mobile swipe
-      // layout (or vice versa), corrupting the pin distance and the layout.
-      mm.add("(min-width: 1024px)", () => {
-        if (reduce || touch) return;
-
-        const el = track.current!;
-        const distance = () => Math.max(el.scrollWidth - window.innerWidth, 0);
-
-        gsap.to(el, {
-          x: () => -distance(),
-          ease: "none",
-          scrollTrigger: {
-            trigger: root.current,
-            start: "top top",
-            end: () => "+=" + distance(),
-            pin: true,
-            scrub: 1,
-            invalidateOnRefresh: true,
-          },
-        });
-
-        gsap.to(".process-progress", {
-          scaleX: 1,
-          ease: "none",
-          scrollTrigger: {
-            trigger: root.current,
-            start: "top top",
-            end: () => "+=" + distance(),
-            scrub: true,
-            invalidateOnRefresh: true,
-          },
-        });
-
-        return () => {
-          gsap.set(el, { clearProps: "transform" });
-        };
+      gsap.to(el, {
+        x: () => -distance(),
+        ease: "none",
+        scrollTrigger: {
+          trigger: root.current,
+          start: "top top",
+          end: () => "+=" + distance(),
+          pin: true,
+          scrub: 1,
+          invalidateOnRefresh: true,
+        },
       });
 
-      return () => mm.revert();
+      gsap.to(".process-progress", {
+        scaleX: 1,
+        ease: "none",
+        scrollTrigger: {
+          trigger: root.current,
+          start: "top top",
+          end: () => "+=" + distance(),
+          scrub: true,
+          invalidateOnRefresh: true,
+        },
+      });
+
+      return () => {
+        gsap.set(el, { clearProps: "transform" });
+      };
     },
     { scope: root },
   );
@@ -94,55 +87,70 @@ export function Process() {
     <section
       id="process"
       ref={root}
-      className="relative border-y border-line bg-paper-2 max-lg:py-24 lg:min-h-dvh lg:overflow-hidden"
+      className={cn(
+        "relative border-y border-line bg-paper-2",
+        touch ? "py-24" : "min-h-dvh overflow-hidden",
+      )}
     >
-      <div className="pointer-events-none px-6 max-lg:static max-lg:mb-10 md:left-12 lg:absolute lg:left-6 lg:top-28 lg:z-10 lg:px-0">
+      <div
+        className={cn(
+          "pointer-events-none z-10 px-6 md:left-12",
+          touch ? "static mb-10" : "absolute left-6 top-28",
+        )}
+      >
         <Badge>The method</Badge>
         <h2 className="mt-5 max-w-md font-display text-4xl font-light leading-[0.95] tracking-tight md:text-6xl">
           A calm site is a <span className="italic-accent text-clay">safe</span>{" "}
           site.
         </h2>
-        <p className="mt-4 font-mono text-[0.68rem] uppercase tracking-[0.16em] text-ink-mute lg:hidden">
-          Swipe to explore →
-        </p>
+        {touch && (
+          <p className="mt-4 font-mono text-[0.68rem] uppercase tracking-[0.16em] text-ink-mute">
+            Swipe to explore →
+          </p>
+        )}
       </div>
 
       <div
         ref={track}
         className={cn(
-          "flex gap-6 px-6 md:gap-10 md:px-12",
-          "max-lg:snap-x max-lg:snap-mandatory max-lg:overflow-x-auto max-lg:pb-6 max-lg:touch-pan-x",
-          "lg:h-dvh lg:items-center lg:overflow-visible",
+          "flex gap-6 px-6 will-change-transform md:gap-10 md:px-12",
+          touch
+            ? "touch-pan-x snap-x snap-mandatory overflow-x-auto pb-6"
+            : "h-dvh items-center",
         )}
       >
-        {/* Leading spacer — desktop horizontal scroll offset only */}
-        <div className="hidden shrink-0 lg:block lg:w-[40vw]" />
+        {!touch && <div className="w-[44vw] shrink-0 md:w-[40vw]" />}
 
         {steps.map((s) => (
           <article
             key={s.n}
             className={cn(
               "group relative flex shrink-0 overflow-hidden rounded-lg border border-line bg-paper",
-              "max-lg:w-[88vw] max-lg:snap-center max-lg:flex-col",
-              "lg:h-[64vh] lg:w-[40vw] lg:flex-row",
+              touch
+                ? "w-[88vw] snap-center flex-col"
+                : "h-[64vh] w-[84vw] flex-row sm:w-[64vw] md:w-[52vw] lg:w-[40vw]",
             )}
           >
             <div
               className={cn(
                 "media grain relative shrink-0 overflow-hidden",
-                "max-lg:aspect-[4/3] max-lg:w-full",
-                "lg:h-full lg:w-1/2",
+                touch ? "aspect-[4/3] w-full" : "w-1/2",
               )}
             >
               <Image
                 src={s.image}
                 alt={s.title}
                 fill
-                sizes="(max-width: 1024px) 88vw, 30vw"
+                sizes={touch ? "88vw" : "30vw"}
                 className="object-cover transition-transform duration-[1.2s] ease-out group-hover:scale-105"
               />
             </div>
-            <div className="flex w-full flex-col justify-between p-6 lg:h-full lg:w-1/2 lg:p-8">
+            <div
+              className={cn(
+                "flex flex-col justify-between",
+                touch ? "w-full p-6" : "w-1/2 p-8",
+              )}
+            >
               <span className="font-display text-5xl font-light text-ink/15 lg:text-7xl">
                 {s.n}
               </span>
@@ -159,12 +167,14 @@ export function Process() {
           </article>
         ))}
 
-        <div className="hidden w-[12vw] shrink-0 lg:block" />
+        {!touch && <div className="w-[12vw] shrink-0" />}
       </div>
 
-      <div className="absolute inset-x-6 bottom-8 z-10 hidden h-px overflow-hidden bg-ink/15 md:inset-x-12 lg:block">
-        <div className="process-progress h-full w-full origin-left scale-x-0 bg-clay" />
-      </div>
+      {!touch && (
+        <div className="absolute inset-x-6 bottom-8 z-10 h-px overflow-hidden bg-ink/15 md:inset-x-12">
+          <div className="process-progress h-full w-full origin-left scale-x-0 bg-clay" />
+        </div>
+      )}
     </section>
   );
 }
